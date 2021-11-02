@@ -1,0 +1,22 @@
+{
+    "name": "apility/twentyfourseven-office",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thomas Alrek",
+            "email": "thomas@apility.no"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Apility\\TwentyfourSevenOffice\\": "src/"
+        }
+    },
+    "require-dev": {
+        "larapack/dd": "^1.1",
+        "vlucas/phpdotenv": "^5.3",
+        "apility/test-utilities": "^0.0.12",
+        "laravel/framework": "^8.0"
+    }
+}
