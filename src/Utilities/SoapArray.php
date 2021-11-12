@@ -1,6 +1,6 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Utilities;
+namespace Apility\Office247\Utilities;
 
 class SoapArray
 {

@@ -1,60 +1,62 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Types;
+namespace Apility\Office247\Types;
 
-use Apility\TwentyfourSevenOffice\Exceptions\TwentyfourSevenOfficeException;
-use Apility\TwentyfourSevenOffice\Types\Company\CompanyType;
-use Apility\TwentyfourSevenOffice\Types\Company\Relation;
-use Apility\TwentyfourSevenOffice\Types\Company\CompanyMap;
-use Apility\TwentyfourSevenOffice\Types\Company\DistributionMethod;
-use Apility\TwentyfourSevenOffice\Types\Company\CurrencyType;
-use Apility\TwentyfourSevenOffice\Types\TwentyfourSevenOfficeType;
-use Apility\TwentyfourSevenOffice\Utilities\SoapArray;
+use Apility\Office247\Exceptions\TwentyfourSevenOfficeException;
+use Apility\Office247\Types\CompanyType;
+use Apility\Office247\Types\ArrayOfRelation;
+use Apility\Office247\Types\PhoneNumbers;
+use Apility\Office247\Types\EmailAddresses;
+use Apility\Office247\Types\CompanyMap;
+use Apility\Office247\Types\DistributionMethod;
+use Apility\Office247\Types\CurrencyType;
+use Apility\Office247\Types\SoapType;
+use Apility\Office247\Utilities\SoapArray;
+use Carbon\Carbon;
+use DateTimeInterface;
 use InvalidArgumentException;
 
-/* <s:element minOccurs="0" maxOccurs="1" name="APIException" type="tns:APIException"/>
-<s:element minOccurs="0" maxOccurs="1" default="-2147483648" name="Id" type="s:int"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="ExternalId" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="OrganizationNumber" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="Name" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="FirstName" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="NickName" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" name="Addresses" type="tns:Addresses"/>
-<s:element minOccurs="0" maxOccurs="1" name="PhoneNumbers" type="tns:PhoneNumbers"/>
-<s:element minOccurs="0" maxOccurs="1" name="EmailAddresses" type="tns:EmailAddresses"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="Url" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="Country" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="Note" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="InvoiceLanguage" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="None" name="Type" type="tns:CompanyType"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="Username" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="Password" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="0001-01-01T00:00:00" name="IncorporationDate" type="s:dateTime"/>
-<s:element minOccurs="0" maxOccurs="1" default="0001-01-01T00:00:00" name="DateCreated" type="s:dateTime"/>
-<s:element minOccurs="0" maxOccurs="1" default="-2147483648" name="Status" type="s:int"/>
-<s:element minOccurs="0" maxOccurs="1" default="-2147483648" name="PriceList" type="s:int"/>
-<s:element minOccurs="0" maxOccurs="1" default="-2147483648" name="Owner" type="s:int"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="BankAccountNo" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="BankAccountType" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="BankAccountCountry" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="" name="BankAccountBic" type="s:string"/>
-<s:element minOccurs="0" maxOccurs="1" default="-2147483648" name="TermsOfDeliveryId" type="s:int"/>
-<s:element minOccurs="0" maxOccurs="1" default="0" name="AccountDebit" type="s:short"/>
-<s:element minOccurs="0" maxOccurs="1" default="0" name="AccountCredit" type="s:short"/>
-<s:element minOccurs="0" maxOccurs="1" default="0.0" name="Discount" type="s:decimal"/>
-<s:element minOccurs="0" maxOccurs="1" default="-2147483648" name="TypeGroup" type="s:int"/>
-<s:element minOccurs="0" maxOccurs="1" default="-79228162514264337593543950335" name="ShareCapital" type="s:decimal"/>
-<s:element minOccurs="0" maxOccurs="1" default="-2147483648" name="NumberOfEmployees" type="s:int"/>
-<s:element minOccurs="0" maxOccurs="1" default="-79228162514264337593543950335" name="Turnover" type="s:decimal"/>
-<s:element minOccurs="0" maxOccurs="1" default="-79228162514264337593543950335" name="Profit" type="s:decimal"/>
-<s:element minOccurs="0" maxOccurs="1" default="-2147483648" name="IndustryId" type="s:int"/>
-<s:element minOccurs="0" maxOccurs="1" default="-2147483648" name="MemberNo" type="s:int"/>
-<s:element minOccurs="0" maxOccurs="1" default="0001-01-01T00:00:00" name="DateChanged" type="s:dateTime"/>
-<s:element minOccurs="0" maxOccurs="1" default="false" name="BlockInvoice" type="s:boolean"/> */
-
 /**
- * @property Relations[] $Relations
- * @property CompanyMap[] $Maps
+ * @property int $Id
+ * @property string $ExternalId
+ * @property string $OrganizationNumber
+ * @property mixed $Name
+ * @property string $Firstname
+ * @property string $Nickname
+ * @property Addresses $Addresses
+ * @property PhoneNumbers $PhoneNumbers
+ * @property EmailAddresses $EmailAddresses
+ * @property string $Url
+ * @property string $Country
+ * @property string $Note
+ * @property string $InvoiceLanguage
+ * @property string $CompanyType
+ * @property string $Username
+ * @property string $Password
+ * @property DateTimeInterface $IncorporationDate
+ * @property DateTimeInterface $DateCreated
+ * @property int $Status
+ * @property int $PriceList
+ * @property int $Owner
+ * @property string $BankAccountNo
+ * @property string $BankAccountType
+ * @property string $BankAccountCountry
+ * @property string $BankAccountBic
+ * @property int $TermsOfDeliveryId
+ * @property int $AccountDebit
+ * @property int $AccountCredit
+ * @property float $Discount
+ * @property int $TypeGroup
+ * @property float $ShareCapital
+ * @property int $NumberOfEmployees
+ * @property float $Turnover
+ * @property float $Profit
+ * @property int $IndustryId
+ * @property int $MemberNo
+ * @property DateTimeInterface $DateChanged
+ * @property bool $BlockInvoice
+ * @property ArrayOfRelation $Relations
+ * @property ArrayOfCompanyMap[] $Maps
  * @property string $DistributionMethod
  * @property string $CurrencyId
  * @property int $PaymentTime
@@ -66,7 +68,7 @@ use InvalidArgumentException;
  * @property bool $Private
  * @property bool $ExplicitlySpecifyNewCompanyId
  */
-final class Company extends TwentyfourSevenOfficeType
+final class Company extends SoapType
 {
     public function __construct(array $attributes = [])
     {
@@ -77,25 +79,44 @@ final class Company extends TwentyfourSevenOfficeType
         }
     }
 
+    public function getAddressesAttribute($Addresses)
+    {
+        return new Addresses((array) $Addresses ?? []);
+    }
+
+    public function getPhoneNumbersAttribute($phoneNumbers)
+    {
+        return new PhoneNumbers((array) $phoneNumbers ?? []);
+    }
+
+    public function getEmailAddressesAttribute($emailAddresses)
+    {
+        return new EmailAddresses((array) $emailAddresses ?? []);
+    }
+
+    public function getIncorporationDateAttribute($incorporationDate)
+    {
+        return Carbon::parse($incorporationDate);
+    }
+
+    public function getDateCreatedAttribute($dateCreated)
+    {
+        return Carbon::parse($dateCreated);
+    }
+
+    public function getDateChangedAttribute($dateChanged)
+    {
+        return Carbon::parse($dateChanged);
+    }
+
     public function getRelationsAttribute($relations)
     {
-        if ($relations) {
-            $relations = SoapArray::toArray($relations->Relation);
-            return array_map(fn ($relation) => new Relation($relation), $relations ?? []);
-        }
-
-        return $relations;
+        return new ArrayOfRelation($relations);
     }
 
     public function getMapsAttribute($maps)
     {
-        if ($maps) {
-            $maps = SoapArray::toArray($maps->Map);
-
-            return array_map(fn ($map) => new CompanyMap((array) $map), (array) $maps ?? []);
-        }
-
-        return [];
+        return new ArrayOfCompanyMap($maps);
     }
 
     public function setTypeAttribute(string $type)

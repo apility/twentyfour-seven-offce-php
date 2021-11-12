@@ -1,20 +1,28 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Services;
-
-use SoapFault;
+namespace Apility\Office247\Services;
 
 use Illuminate\Contracts\Support\Arrayable;
 
-use Apility\TwentyfourSevenOffice\Exceptions\TwentyfourSevenOfficeException;
+use Apility\Office247\Exceptions\TwentyfourSevenOfficeException;
 
-use Apility\TwentyfourSevenOffice\Soap\CompanySoapClient;
-use Apility\TwentyfourSevenOffice\Types\Company\CompanySearchParameters;
-use Apility\TwentyfourSevenOffice\Types\Company;
+use Apility\Office247\Contracts\CompanySoapClientContract;
+use Apility\Office247\Soap\CompanySoapClient;
+use Apility\Office247\Types\CompanySearchParameters;
+use Apility\Office247\Types\Company;
+use Apility\Office247\Types\GetCompaniesResponse;
 
-class CompanyService
+use Apility\Office247\Contracts\CompanyServiceContract;
+use Apility\Office247\Contracts\SoapClientContract;
+
+use Apility\Office247\Concerns\InteractsWithSoapClient;
+use Apility\Office247\Types\SaveCompaniesResponse;
+
+class CompanyService implements CompanyServiceContract
 {
-    /** @var CompanySoapClient */
+    use InteractsWithSoapClient;
+
+    /** @var CompanySoapClientContract */
     protected $client;
 
     public function __construct(CompanySoapClient $client)
@@ -25,10 +33,10 @@ class CompanyService
     /**
      * @param CompanySearchParameters|array $searchParameters
      * @param string[] $returnProperties
-     * @return Company[]
+     * @return GetCompaniesResponse
      * @throws TwentyfourSevenOfficeException
      */
-    public function getCompanies($searchParameters = [], $returnProperties = ['Name', 'Id'])
+    public function GetCompanies($searchParameters = [], array $returnProperties = ['Name', 'Id']): GetCompaniesResponse
     {
         $searchParameters = ($searchParameters instanceof Arrayable) ? $searchParameters->toArray() : $searchParameters;
 
@@ -37,34 +45,30 @@ class CompanyService
             'returnProperties' => $returnProperties,
         ]);
 
-        if (is_array($response->GetCompaniesResult)) {
-            return array_map(fn ($company) => new Company((array) $company->Company), (array) $response->GetCompaniesResult);
-        }
-
-        return [new Company((array) $response->GetCompaniesResult->Company)];
-    }
-
-    /**
-     * @param Company|array $company
-     * @return Company|null
-     * @throws TwentyfourSevenOfficeException
-     */
-    public function saveCompany($company)
-    {
-        $response = $this->saveCompanies([$company]);
-        return array_shift($response);
+        return new GetCompaniesResponse($response);
     }
 
     /**
      * @param Company[]|array[] $companies
-     * @return Company[]
+     * @return SaveCompaniesResponse
      * @throws TwentyfourSevenOfficeException
      */
-    public function saveCompanies($companies = [])
+    public function SaveCompanies($companies = []): SaveCompaniesResponse
     {
         $companies = array_map(fn ($company) => ($company instanceof Arrayable) ? $company->toArray() : $company, $companies);
         $response = $this->client->SaveCompanies(['companies' => $companies]);
 
-        return array_map(fn ($company) => new Company((array) $company), (array) $response->SaveCompaniesResult);
+        return new SaveCompaniesResponse($response);
+    }
+
+    public function setSoapClient(SoapClientContract $soapClient)
+    {
+        $this->client = $soapClient;
+        return $this;
+    }
+
+    public function getSoapClient(): SoapClientContract
+    {
+        return $this->client;
     }
 }

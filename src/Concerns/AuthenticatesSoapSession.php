@@ -1,15 +1,18 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Concerns;
+namespace Apility\Office247\Concerns;
 
-use Apility\TwentyfourSevenOffice\Facades\Auth;
-use Apility\TwentyfourSevenOffice\Soap\TwentyfourSevenOfficeSoapClient;
+use Apility\Office247\Facades\Auth;
+use Apility\Office247\Soap\SoapClient;
 
 trait AuthenticatesSoapSession
 {
+    /**
+     * @return void
+     */
     public function bootAuthenticatesSoapSession()
     {
-        /** @var TwentyfourSevenOfficeSoapClient $this */
-        Auth::authenticateSoapClient($this);
+        /** @var SoapClient $this */
+        Auth::AuthenticateSoapClient($this);
     }
 }

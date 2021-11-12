@@ -1,19 +1,22 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Services;
-
-use SoapFault;
+namespace Apility\Office247\Services;
 
 use Illuminate\Contracts\Support\Arrayable;
 
-use Apility\TwentyfourSevenOffice\Exceptions\TwentyfourSevenOfficeException;
+use Apility\Office247\Exceptions\TwentyfourSevenOfficeException;
 
-use Apility\TwentyfourSevenOffice\Soap\InvoiceSoapClient;
-use Apility\TwentyfourSevenOffice\Types\Company\CompanySearchParameters;
-use Apility\TwentyfourSevenOffice\Types\Company;
+use Apility\Office247\Soap\InvoiceSoapClient;
+use Apility\Office247\Types\Company;
 
-class InvoiceService
+use Apility\Office247\Contracts\InvoiceServiceContract;
+
+use Apility\Office247\Concerns\InteractsWithSoapClient;
+
+class InvoiceService implements InvoiceServiceContract
 {
+    use InteractsWithSoapClient;
+
     /** @var InvoiceSoapClient */
     protected $client;
 
@@ -27,7 +30,7 @@ class InvoiceService
      * @return Company|null
      * @throws TwentyfourSevenOfficeException
      */
-    public function saveInvoice($invoice)
+    public function saveInvoice($invoice): ?Company
     {
         $response = $this->saveInvoices([$invoice]);
         return array_shift($response);
@@ -39,7 +42,7 @@ class InvoiceService
      * @return Company[]
      * @throws TwentyfourSevenOfficeException
      */
-    public function saveInvoices($invoices = [])
+    public function saveInvoices($invoices = []): array
     {
         $invoices = array_map(fn ($invoice) => ($invoice instanceof Arrayable) ? $invoice->toArray() : $invoice, $invoices);
         $response = $this->client->SaveInvoices(['invoices' => $invoices]);

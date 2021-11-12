@@ -1,13 +1,14 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Facades;
+namespace Apility\Office247\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Apility\Office247\Contracts\AuthServiceContract;
 
 /**
- * @method static bool authenticateSession(?string $sessionId)
- * @method static \Apility\TwentyfourSevenOffice\Soap\TwentyfourSevenOfficeSoapClient authenticateSoapClient(\Apility\TwentyfourSevenOffice\Soap\TwentyfourSevenOfficeSoapClient $client)
- * @method static \Apility\TwentyfourSevenOffice\Types\Auth\IdentityResult identity()
+ * @method static bool AuthenticateSession(?string $sessionId)
+ * @method static \Apility\Office247\Soap\SoapClient AuthenticateSoapClient(\Apility\Office247\Soap\SoapClient $client)
+ * @method static \Apility\Office247\Types\GetIdentityResponse GetIdentity()
  */
 class Auth extends Facade
 {
@@ -18,6 +19,6 @@ class Auth extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'twentyfoursevenoffice.auth';
+        return AuthServiceContract::class;
     }
 }

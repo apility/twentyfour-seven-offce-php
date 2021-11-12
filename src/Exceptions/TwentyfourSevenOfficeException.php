@@ -1,6 +1,6 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Exceptions;
+namespace Apility\Office247\Exceptions;
 
 use Exception;
 use SoapFault;

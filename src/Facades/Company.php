@@ -1,13 +1,13 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Facades;
+namespace Apility\Office247\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Apility\Office247\Contracts\CompanyServiceContract;
 
 /**
- * @method static \Apility\TwentyfourSevenOffice\Types\Company[] getCompanies(\Apility\TwentyfourSevenOffice\Types\Company\CompanySearchParameters|array $searchParameters, array $returnProperties)
- * @method static \Apility\TwentyfourSevenOffice\Types\Company saveCompany(\Apility\TwentyfourSevenOffice\Types\Company[]|array)
- * @method static \Apility\TwentyfourSevenOffice\Types\Company[] saveCompanies(\Apility\TwentyfourSevenOffice\Types\Company[]|array[])
+ * @method static \Apility\Office247\Types\GetCompaniesResponse GetCompanies(\Apility\Office247\Types\CompanySearchParameters|array $searchParameters, array $returnProperties)
+ * @method static \Apility\Office247\Types\SaveCompaniesResponse SaveCompanies(\Apility\Office247\Types\Company[]|array[])
  */
 class Company extends Facade
 {
@@ -18,6 +18,6 @@ class Company extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'twentyfoursevenoffice.company';
+        return CompanyServiceContract::class;
     }
 }

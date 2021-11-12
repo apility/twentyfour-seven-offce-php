@@ -2,7 +2,7 @@
 
 namespace Apility\TwentyfourSevenOffice;
 
-use Apility\TwentyfourSevenOffice\Soap\Auth;
+use Apility\Office247\Soap\Auth;
 
 class Client
 {

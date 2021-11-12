@@ -1,11 +1,11 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Soap;
+namespace Apility\Office247\Soap;
 
-use Apility\TwentyfourSevenOffice\Soap\TwentyfourSevenOfficeSoapClient;
-use Apility\TwentyfourSevenOffice\Concerns\AuthenticatesSoapSession;
+use Apility\Office247\Soap\SoapClient;
+use Apility\Office247\Concerns\AuthenticatesSoapSession;
 
-class InvoiceSoapClient extends TwentyfourSevenOfficeSoapClient
+class InvoiceSoapClient extends SoapClient
 {
     use AuthenticatesSoapSession;
 

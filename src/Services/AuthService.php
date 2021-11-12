@@ -1,39 +1,44 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Services;
+namespace Apility\Office247\Services;
 
-use Apility\TwentyfourSevenOffice\Exceptions\AuthException;
-use Apility\TwentyfourSevenOffice\Exceptions\LoginException;
+use Apility\Office247\Exceptions\AuthException;
+use Apility\Office247\Exceptions\LoginException;
 
-use Apility\TwentyfourSevenOffice\Soap\AuthSoapClient;
-use Apility\TwentyfourSevenOffice\Soap\TwentyfourSevenOfficeSoapClient;
-
+use Apility\Office247\Soap\AuthSoapClient;
+use Apility\Office247\Types\GetIdentityResponse;
+use Apility\Office247\Types\LoginResponse;
 use Illuminate\Support\Facades\Cache;
 
-class AuthService
+use Apility\Office247\Contracts\AuthServiceContract;
+use Apility\Office247\Contracts\AuthSoapClientContract;
+use Apility\Office247\Contracts\SoapClientContract;
+
+use Apility\Office247\Concerns\InteractsWithSoapClient;
+
+class AuthService implements AuthServiceContract
 {
+    use InteractsWithSoapClient;
+
     /** @var string */
     protected $cookieName = 'ASP.NET_SessionId';
 
     /** @var AuthSoapClient */
-    protected AuthSoapClient $client;
+    protected AuthSoapClientContract $client;
 
     /** @var array */
     protected array $credentials;
 
-    /** @var string|null */
-    protected ?string $sessionId = null;
+    /** @var LoginResponse|null */
+    protected ?LoginResponse $loginResponse = null;
 
     /** @var array|null */
     protected ?array $identity = null;
 
     /**
-     * Undocumented function
-     *
      * @param array $credentials
-     * @param string|null $sessionId
      */
-    public function __construct(array $credentials, ?string $sessionId = null)
+    public function __construct(array $credentials)
     {
         $this->client = new AuthSoapClient;
 
@@ -44,36 +49,35 @@ class AuthService
             'IdentityId' => $credentials['identity_id'] ?? null,
         ];
 
-        $this->sessionId = $sessionId;
+        $this->loginResponse = null;
     }
 
     /**
      * @return boolean
      */
-    protected function authenticated(): bool
+    public function Authenticated(): bool
     {
-        return $this->sessionId !== null;
+        return $this->loginResponse !== null && $this->loginResponse->LoginResult;
     }
 
     /**
      * @throws LoginException
-     * @return AuthSoapClient
+     * @return LoginResponse
      */
-    protected function login(): AuthSoapClient
+    public function Login(): LoginResponse
     {
-        if (!$this->authenticated()) {
-            $response = $this->client->Login(['credential' => $this->credentials]);
-            $this->sessionId = $response->LoginResult;
+        if (!$this->Authenticated()) {
+            $this->loginResponse = new LoginResponse($this->client->Login(['credential' => $this->credentials]));
 
-            if (!$this->sessionId) {
+            if (!$this->loginResponse->LoginResult) {
                 throw new LoginException('Login failed');
             }
         }
 
-        $this->client->__setCookie($this->cookieName, $this->sessionId);
-        Cache::rememberForever('twentyfoursevenoffice.session_id', fn () => $this->sessionId);
+        $this->client->__setCookie($this->cookieName, $this->loginResponse->LoginResult);
+        Cache::rememberForever('twentyfoursevenoffice.login_response', fn () => $this->loginResponse);
 
-        return $this->client;
+        return $this->loginResponse;
     }
 
     /**
@@ -82,19 +86,19 @@ class AuthService
      * @param string|null $sessionId
      * @return bool
      */
-    public function authenticateSession(?string $sessionId): bool
+    public function AuthenticateSession(?string $sessionId = null): bool
     {
         if ($sessionId) {
-            $this->sessionId = $sessionId;
-            $this->client->__setCookie($this->cookieName, $this->sessionId);
+            $this->loginResponse = new LoginResponse(['LoginResult' => $sessionId]);
+            $this->client->__setCookie($this->cookieName, $sessionId);
 
             try {
-                $this->identity();
+                $this->GetIdentity();
                 return true;
             } catch (AuthException $e) {
-                $this->sessionId = null;
+                $this->loginResponse = null;
                 $this->client->__setCookie($this->cookieName, '');
-                Cache::forget('twentyfoursevenoffice.session_id');
+                Cache::forget('twentyfoursevenoffice.login_response');
             }
         }
 
@@ -102,21 +106,26 @@ class AuthService
     }
 
     /**
-     * @param TwentyfourSevenOfficeSoapClient $client
-     * @return TwentyfourSevenOfficeSoapClient
+     * @param SoapClientContract $client
+     * @return SoapClientContract
+     * @throws AuthException
      */
-    public function authenticateSoapClient(TwentyfourSevenOfficeSoapClient $client)
+    public function AuthenticateSoapClient(SoapClientContract $client): SoapClientContract
     {
-        $this->login();
-        $client->__setCookie($this->cookieName, $this->sessionId);
-        return $client;
+        if ($loginResponse = $this->Login()) {
+            $client->__setCookie($this->cookieName, $loginResponse->LoginResult);
+            return $client;
+        }
+
+        throw new AuthException;
     }
 
     /**
-     * @return IdentityResult
+     * @return GetIdentityResponse
      */
-    public function identity()
+    public function GetIdentity(): GetIdentityResponse
     {
-        return $this->login()->GetIdentity()->GetIdentityResult;
+        $this->Login();
+        return new GetIdentityResponse($this->client->GetIdentity());
     }
 }

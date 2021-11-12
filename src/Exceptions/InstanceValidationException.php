@@ -1,8 +1,8 @@
 <?php
 
-namespace Apility\TwentyfourSevenOffice\Exceptions;
+namespace Apility\Office247\Exceptions;
 
-use Apility\TwentyfourSevenOffice\Exceptions\TwentyfourSevenOfficeException;
+use Apility\Office247\Exceptions\TwentyfourSevenOfficeException;
 
 class InstanceValidationException extends TwentyfourSevenOfficeException
 {
